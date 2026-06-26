@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import AnyHttpUrl, BaseModel
 
 
 class Detection(BaseModel):
@@ -15,4 +15,4 @@ class DetectResponse(BaseModel):
 
 
 class DetectURLRequest(BaseModel):
-    url: str
+    url: AnyHttpUrl
