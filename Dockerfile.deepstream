@@ -12,6 +12,7 @@ COPY pipeline/ /app/pipeline/
 RUN g++ -shared -fPIC -o /app/pipeline/config/libbbox_parser.so \
     /app/pipeline/config/bbox_parser.cpp \
     -I/opt/nvidia/deepstream/deepstream/sources/includes \
+    -I/usr/local/cuda/include \
     -L/opt/nvidia/deepstream/deepstream/lib \
     -lnvdsgst_meta -lnvds_meta \
     && echo "Stub parser compiled OK"
