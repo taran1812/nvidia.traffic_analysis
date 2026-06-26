@@ -1,0 +1,15 @@
+[property]
+gpu-id=0
+net-scale-factor=0.0039215697906911373
+model-engine-file=/models/yolov8n.engine
+labelfile-path=/app/pipeline/config/labels.txt
+batch-size=1
+network-type=100
+num-detected-classes=80
+interval=0
+gie-unique-id=1
+output-blob-names=output0
+cluster-mode=2
+parse-bbox-func-name=NvDsInferParseCustomYoloV8Stub
+custom-lib-path=/app/pipeline/config/libbbox_parser.so
+output-tensor-meta=1
