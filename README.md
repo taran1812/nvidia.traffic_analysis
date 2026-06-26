@@ -1,3 +1,4 @@
+
 # nvidia-traffic-analytics
 
 Real-time traffic video analytics pipeline built on Nvidia's production AI stack. Detects and counts vehicles in video streams using a TensorRT-optimized YOLOv8 model served through Triton Inference Server, with full GPU observability.
@@ -19,6 +20,17 @@ Built to benchmark the full Nvidia inference optimization chain — PyTorch → 
 
 TensorRT FP16 delivers **1.8× faster inference** over PyTorch baseline with **44% latency reduction**.  
 99.1% of model nodes converted to FP16. Engine size: 8.8MB.
+
+**Triton serving — batch sweep (RTX 3050 Ti, TRT 10.3 FP16):**
+
+| Batch | Mean latency | p50 | p95 | Throughput |
+|---|---|---|---|---|
+| 1 | 20.8ms | 20.4ms | 22.9ms | 48 FPS |
+| 4 | 63.7ms | 59.6ms | 88.0ms | **63 FPS** |
+| 8 | 151ms | 130ms | 197ms | 53 FPS |
+| 16 | 270ms | 244ms | 396ms | 59 FPS |
+
+Peak throughput at batch=4 (63 FPS). Dynamic batching configured via Triton with preferred batch sizes [4, 8].
 
 ---
 
@@ -44,7 +56,7 @@ Video input (MP4 / RTSP)
 
 | Tool | Purpose |
 |---|---|
-| TensorRT 11.1 | FP16 model optimization and engine building |
+| TensorRT 10.3 | FP16 model optimization — engine rebuilt inside Triton 24.08 container for TRT 10.3 compatibility |
 | Triton Inference Server | Production inference serving with dynamic batching |
 | DeepStream SDK | GPU-accelerated video analytics pipeline |
 | ModelOpt AutoCast | Automatic FP16 quantization (231/233 nodes) |
@@ -67,23 +79,18 @@ Video input (MP4 / RTSP)
 
 - [x] Pull Nvidia DeepStream Docker image (`nvcr.io/nvidia/deepstream:7.1-triton-multiarch`)
 - [x] Build DeepStream pipeline: video file → TensorRT YOLOv8 → bounding boxes
-- [x] Download UA-DETRAC traffic dataset (public, free)
-- [x] Add vehicle counting logic: cars/trucks/buses/motorcycles per frame, per minute
-- [x] Validate pipeline end-to-end on traffic video — 1443 frames @ 30fps, green bboxes + count overlay confirmed
+- [x] Download UA-DETRAC traffic dataset
+- [x] Add vehicle counting logic: sliding 60s window per class
+- [x] Resolve dGPU compatibility issues, validate pipeline end-to-end
 
-**dGPU fixes applied:**
-- `pyds` 1.1.11 wheel installed in Dockerfile (not bundled in triton-multiarch image)
-- TRT engine rebuilt inside container (`trtexec`) — host engine was TRT 11.1, container has TRT 10.3
-- `nvv4l2h264enc` (V4L2/Jetson) replaced with `theoraenc` software encoder for x86 dGPU
-- `nvtracker` removed (requires config file; not needed for counting)
+### ✅ Week 3: Triton Inference Server
 
-### 🔲 Week 3: Triton Inference Server
-
-- [ ] Export embedding model to ONNX for Triton serving
-- [ ] Configure Triton model repository with TensorRT engine
-- [ ] Enable dynamic batching in Triton config
-- [ ] Benchmark single-frame vs batched inference throughput
-- [ ] Expose Triton `/metrics` endpoint to Prometheus
+- [x] Rebuild YOLOv8n TRT engine with dynamic batch (min=1, opt=8, max=16) via TRT 10.3
+- [x] Configure Triton model repository — TRT backend, explicit batch (max_batch_size=0)
+- [x] Docker Compose stack: Triton 24.08 + Prometheus + Grafana
+- [x] Prometheus scraping Triton `/metrics` at 5s interval
+- [x] Grafana dashboard: GPU util, throughput, compute latency, VRAM
+- [x] Batch sweep benchmark (1/4/8/16) — peak 63 FPS at batch=4 on RTX 3050 Ti
 
 ### 🔲 Week 4: FastAPI gateway
 
