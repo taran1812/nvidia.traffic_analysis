@@ -69,7 +69,13 @@ Video input (MP4 / RTSP)
 - [x] Build DeepStream pipeline: video file → TensorRT YOLOv8 → bounding boxes
 - [x] Download UA-DETRAC traffic dataset (public, free)
 - [x] Add vehicle counting logic: cars/trucks/buses/motorcycles per frame, per minute
-- [ ] Validate pipeline end-to-end on traffic video (requires Docker + GPU — run manually)
+- [x] Validate pipeline end-to-end on traffic video — 1443 frames @ 30fps, green bboxes + count overlay confirmed
+
+**dGPU fixes applied:**
+- `pyds` 1.1.11 wheel installed in Dockerfile (not bundled in triton-multiarch image)
+- TRT engine rebuilt inside container (`trtexec`) — host engine was TRT 11.1, container has TRT 10.3
+- `nvv4l2h264enc` (V4L2/Jetson) replaced with `theoraenc` software encoder for x86 dGPU
+- `nvtracker` removed (requires config file; not needed for counting)
 
 ### 🔲 Week 3: Triton Inference Server
 

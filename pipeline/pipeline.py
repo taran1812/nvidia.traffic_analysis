@@ -181,19 +181,18 @@ def _build_pipeline(input_path, output_path):
     decoder = Gst.ElementFactory.make('decodebin', 'decoder')
     muxer = Gst.ElementFactory.make('nvstreammux', 'muxer')
     infer = Gst.ElementFactory.make('nvinfer', 'infer')
-    tracker = Gst.ElementFactory.make('nvtracker', 'tracker')
     osd = Gst.ElementFactory.make('nvdsosd', 'osd')
-    converter = Gst.ElementFactory.make('nvvideoconvert', 'converter')
-    encoder = Gst.ElementFactory.make('nvv4l2h264enc', 'encoder')
-    h264parse = Gst.ElementFactory.make('h264parse', 'h264parse')
-    muxout = Gst.ElementFactory.make('qtmux', 'muxout')
+    nvconv = Gst.ElementFactory.make('nvvideoconvert', 'nvconv')
+    conv = Gst.ElementFactory.make('videoconvert', 'conv')
+    encoder = Gst.ElementFactory.make('theoraenc', 'encoder')
+    muxout = Gst.ElementFactory.make('oggmux', 'muxout')
     sink = Gst.ElementFactory.make('filesink', 'sink')
 
     for name, el in [
         ('filesrc', source), ('decodebin', decoder), ('nvstreammux', muxer),
-        ('nvinfer', infer), ('nvtracker', tracker), ('nvdsosd', osd),
-        ('nvvideoconvert', converter), ('nvv4l2h264enc', encoder),
-        ('h264parse', h264parse), ('qtmux', muxout), ('filesink', sink),
+        ('nvinfer', infer), ('nvdsosd', osd),
+        ('nvvideoconvert', nvconv), ('videoconvert', conv),
+        ('theoraenc', encoder), ('oggmux', muxout), ('filesink', sink),
     ]:
         if not el:
             raise RuntimeError(f"Failed to create GStreamer element: {name}")
@@ -210,6 +209,9 @@ def _build_pipeline(input_path, output_path):
 
     def on_pad_added(src, pad, mux):
         sink_pad = mux.get_request_pad('sink_0')
+        if not sink_pad:
+            print("ERROR: Could not get nvstreammux sink pad", file=sys.stderr)
+            return
         if pad.link(sink_pad) != Gst.PadLinkReturn.OK:
             print("ERROR: Failed to link decoder → muxer", file=sys.stderr)
 
@@ -217,12 +219,11 @@ def _build_pipeline(input_path, output_path):
 
     source.link(decoder)
     muxer.link(infer)
-    infer.link(tracker)
-    tracker.link(osd)
-    osd.link(converter)
-    converter.link(encoder)
-    encoder.link(h264parse)
-    h264parse.link(muxout)
+    infer.link(osd)
+    osd.link(nvconv)
+    nvconv.link(conv)
+    conv.link(encoder)
+    encoder.link(muxout)
     muxout.link(sink)
 
     return pipeline, infer
@@ -231,7 +232,7 @@ def _build_pipeline(input_path, output_path):
 def main():
     ap = argparse.ArgumentParser(description='DeepStream vehicle detection pipeline')
     ap.add_argument('--input', required=True, help='Input video path')
-    ap.add_argument('--output', default='/app/pipeline/output/out.mp4', help='Output video path')
+    ap.add_argument('--output', default='/app/pipeline/output/out.ogv', help='Output video path')
     ap.add_argument('--engine', default='/models/yolov8n.engine', help='TensorRT engine path')
     ap.add_argument('--fps', type=float, default=30.0, help='Video FPS for per-minute window')
     args = ap.parse_args()

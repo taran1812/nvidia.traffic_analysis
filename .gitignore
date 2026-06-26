@@ -22,3 +22,9 @@ __pycache__/
 # pipeline outputs
 pipeline/output/*.mp4
 pipeline/output/*.avi
+pipeline/output/*.ogv
+pipeline/output/*.jpg
+pipeline/data/
+
+# temp scripts
+make_video.py
