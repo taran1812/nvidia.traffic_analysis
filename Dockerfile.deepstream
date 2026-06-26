@@ -1,0 +1,24 @@
+FROM nvcr.io/nvidia/deepstream:7.1-triton-multiarch
+
+WORKDIR /app
+
+# Python deps
+RUN pip3 install --no-cache-dir numpy==1.24.4 opencv-python-headless==4.8.0.76
+
+# Copy pipeline source
+COPY pipeline/ /app/pipeline/
+
+# Compile stub bbox parser
+RUN g++ -shared -fPIC -o /app/pipeline/config/libbbox_parser.so \
+    /app/pipeline/config/bbox_parser.cpp \
+    -I/opt/nvidia/deepstream/deepstream/sources/includes \
+    -L/opt/nvidia/deepstream/deepstream/lib \
+    -lnvdsgst_meta -lnvds_meta \
+    && echo "Stub parser compiled OK"
+
+# Engine mounted at runtime via -v flag — not baked into image
+# Run: docker run --gpus all \
+#   -v $(pwd)/yolov8n.engine:/models/yolov8n.engine \
+#   -v $(pwd)/pipeline/output:/app/pipeline/output \
+#   deepstream-traffic \
+#   python3 pipeline/pipeline.py --input /data/traffic.mp4
