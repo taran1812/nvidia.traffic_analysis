@@ -1,0 +1,91 @@
+{
+  "title": "Triton Inference Server",
+  "uid": "triton-yolov8",
+  "version": 1,
+  "schemaVersion": 38,
+  "refresh": "5s",
+  "time": { "from": "now-5m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "GPU Utilization %",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "nv_gpu_utilization",
+          "legendFormat": "GPU {{gpu_uuid}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Inference Throughput (req/sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 9, "x": 6, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(nv_inference_request_success{model=\"yolov8n\"}[30s])",
+          "legendFormat": "requests/sec"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Inference Compute Latency (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 9, "x": 15, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "ms" }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(nv_inference_compute_infer_duration_us{model=\"yolov8n\"}[30s]) / rate(nv_inference_request_success{model=\"yolov8n\"}[30s]) / 1000",
+          "legendFormat": "compute latency ms"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(nv_inference_queue_duration_us{model=\"yolov8n\"}[30s]) / rate(nv_inference_request_success{model=\"yolov8n\"}[30s]) / 1000",
+          "legendFormat": "queue latency ms"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "GPU Memory Used (MB)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "decmbytes" }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "nv_gpu_memory_used_bytes / 1024 / 1024",
+          "legendFormat": "VRAM used MB"
+        }
+      ]
+    }
+  ]
+}
