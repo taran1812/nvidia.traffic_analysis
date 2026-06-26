@@ -63,13 +63,13 @@ Video input (MP4 / RTSP)
 - [x] TensorRT FP16 engine build — yolov8n.engine (8.8MB, 88s compile)
 - [x] 3-way benchmark: PyTorch vs ONNX vs TensorRT — **1.8× improvement**
 
-### 🔲 Week 2: DeepStream pipeline
+### ✅ Week 2: DeepStream pipeline
 
-- [ ] Pull Nvidia DeepStream Docker image (`nvcr.io/nvidia/deepstream:7.1-triton-multiarch`)
-- [ ] Build DeepStream pipeline: video file → TensorRT YOLOv8 → bounding boxes
-- [ ] Download UA-DETRAC traffic dataset (public, free)
-- [ ] Add vehicle counting logic: cars/trucks/bikes per frame, per minute
-- [ ] Validate pipeline end-to-end on traffic video
+- [x] Pull Nvidia DeepStream Docker image (`nvcr.io/nvidia/deepstream:7.1-triton-multiarch`)
+- [x] Build DeepStream pipeline: video file → TensorRT YOLOv8 → bounding boxes
+- [x] Download UA-DETRAC traffic dataset (public, free)
+- [x] Add vehicle counting logic: cars/trucks/buses/motorcycles per frame, per minute
+- [ ] Validate pipeline end-to-end on traffic video (requires Docker + GPU — run manually)
 
 ### 🔲 Week 3: Triton Inference Server
 
