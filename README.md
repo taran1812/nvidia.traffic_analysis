@@ -65,7 +65,7 @@ Video input (MP4 / RTSP)
 
 ### 🔲 Week 2: DeepStream pipeline
 
-- [ ] Pull Nvidia DeepStream Docker image (`nvcr.io/nvidia/deepstream:6.4-gc-triton-devel`)
+- [ ] Pull Nvidia DeepStream Docker image (`nvcr.io/nvidia/deepstream:7.1-triton-multiarch`)
 - [ ] Build DeepStream pipeline: video file → TensorRT YOLOv8 → bounding boxes
 - [ ] Download UA-DETRAC traffic dataset (public, free)
 - [ ] Add vehicle counting logic: cars/trucks/bikes per frame, per minute
