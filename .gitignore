@@ -1,0 +1,20 @@
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.env
+
+# large model/engine files
+*.pt
+*.onnx
+*.engine
+*.trt
+
+# data
+*.jpg
+*.mp4
+*.avi
+
+# IDE
+.vscode/
+.idea/
