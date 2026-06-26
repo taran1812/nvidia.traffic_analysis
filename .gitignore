@@ -28,3 +28,7 @@ pipeline/data/
 
 # temp scripts
 make_video.py
+
+# serving outputs
+serving/results/*.json
+serving/results/*.png
