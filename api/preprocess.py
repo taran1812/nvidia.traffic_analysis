@@ -19,6 +19,8 @@ def load_from_url(url: str) -> np.ndarray:
 
 def preprocess(img: np.ndarray) -> np.ndarray:
     """Resize to 640x640, BGR→RGB, normalize [0,1], return CHW float32."""
+    if img.ndim != 3 or img.shape[2] != 3:
+        raise ValueError(f"Expected 3-channel BGR image, got shape {img.shape}")
     img = cv2.resize(img, (640, 640))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = img.astype(np.float32) / 255.0
