@@ -1,0 +1,35 @@
+{
+  "date": "2026-06-26T11:36:55.306620",
+  "model": "yolov8n",
+  "triton_url": "localhost:8000",
+  "results": [
+    {
+      "batch_size": 1,
+      "mean_latency_ms": 20.822607399986737,
+      "p50_latency_ms": 20.360897500040664,
+      "p95_latency_ms": 22.901992650076863,
+      "throughput_fps": 48.02472528011247
+    },
+    {
+      "batch_size": 4,
+      "mean_latency_ms": 63.73434887001622,
+      "p50_latency_ms": 59.56480750000992,
+      "p95_latency_ms": 87.96409194987973,
+      "throughput_fps": 62.76050624064345
+    },
+    {
+      "batch_size": 8,
+      "mean_latency_ms": 151.42226983996807,
+      "p50_latency_ms": 129.90961450009308,
+      "p95_latency_ms": 197.3014140499799,
+      "throughput_fps": 52.832387260175594
+    },
+    {
+      "batch_size": 16,
+      "mean_latency_ms": 270.04039815999477,
+      "p50_latency_ms": 244.05956550003793,
+      "p95_latency_ms": 396.2111759998379,
+      "throughput_fps": 59.25039404852398
+    }
+  ]
+}

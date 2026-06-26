@@ -8,7 +8,6 @@ services:
       - "8002:8002"
     volumes:
       - ./model_repository:/models
-      - ../yolov8n_trt10.engine:/models/yolov8n/1/model.plan:ro
     deploy:
       resources:
         reservations:
