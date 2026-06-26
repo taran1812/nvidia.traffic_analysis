@@ -1,0 +1,24 @@
+name: "yolov8n"
+backend: "tensorrt"
+max_batch_size: 16
+
+dynamic_batching {
+  preferred_batch_size: [4, 8]
+  max_queue_delay_microseconds: 100
+}
+
+input [
+  {
+    name: "images"
+    data_type: TYPE_FP32
+    dims: [3, 640, 640]
+  }
+]
+
+output [
+  {
+    name: "output0"
+    data_type: TYPE_FP32
+    dims: [84, 8400]
+  }
+]
