@@ -28,21 +28,23 @@ def preprocess(img_path):
 
 def benchmark_pytorch(img_np):
     from ultralytics import YOLO
-    model = YOLO(MODEL_PATH)
-    model.to("cuda")
 
+    model = YOLO(MODEL_PATH)
+    model.model.eval().cuda()
     img_tensor = torch.from_numpy(img_np).cuda()
 
-    # warmup
     for _ in range(5):
         with torch.no_grad():
-            model.predict(IMG_PATH, device="cuda", verbose=False)
+            model.model(img_tensor)
+        torch.cuda.synchronize()
 
     latencies = []
     for _ in range(RUNS):
+        torch.cuda.synchronize()
         start = time.perf_counter()
         with torch.no_grad():
-            model.predict(IMG_PATH, device="cuda", verbose=False)
+            model.model(img_tensor)
+        torch.cuda.synchronize()
         latencies.append((time.perf_counter() - start) * 1000)
 
     return latencies
@@ -60,7 +62,6 @@ def benchmark_onnx(img_np):
     )
     input_name = session.get_inputs()[0].name
 
-    # warmup
     for _ in range(5):
         session.run(None, {input_name: img_np})
 
@@ -86,9 +87,11 @@ def benchmark_tensorrt(img_np):
 
     context = engine.create_execution_context()
 
-    # allocate buffers
-    input_shape = (1, 3, 640, 640)
-    output_shape = (1, 84, 8400)  # YOLOv8n output
+    # resolve I/O shapes from engine at runtime — no hardcoded assumptions
+    input_name = engine.get_tensor_name(0)
+    output_name = engine.get_tensor_name(1)
+    input_shape = tuple(engine.get_tensor_shape(input_name))
+    output_shape = tuple(engine.get_tensor_shape(output_name))
 
     h_input = cuda.pagelocked_empty(int(np.prod(input_shape)), dtype=np.float32)
     h_output = cuda.pagelocked_empty(int(np.prod(output_shape)), dtype=np.float32)
@@ -96,17 +99,17 @@ def benchmark_tensorrt(img_np):
     d_output = cuda.mem_alloc(h_output.nbytes)
     stream = cuda.Stream()
 
+    context.set_tensor_address(input_name, int(d_input))
+    context.set_tensor_address(output_name, int(d_output))
+
     np.copyto(h_input, img_np.ravel())
 
     def infer():
         cuda.memcpy_htod_async(d_input, h_input, stream)
-        context.execute_async_v2(
-            bindings=[int(d_input), int(d_output)], stream_handle=stream.handle
-        )
+        context.execute_async_v3(stream_handle=stream.handle)
         cuda.memcpy_dtoh_async(h_output, d_output, stream)
         stream.synchronize()
 
-    # warmup
     for _ in range(5):
         infer()
 
