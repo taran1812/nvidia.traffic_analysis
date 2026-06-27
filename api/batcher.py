@@ -1,6 +1,8 @@
 import asyncio
 import numpy as np
 
+from api.metrics import batcher_batch_size, batcher_queue_depth
+
 
 class AsyncBatcher:
     def __init__(self, triton, max_batch: int = 16, drain_interval: float = 0.05, max_queue: int = 500):
@@ -31,6 +33,7 @@ class AsyncBatcher:
         loop = asyncio.get_running_loop()
         future: asyncio.Future = loop.create_future()
         await self._queue.put((frame, future))
+        batcher_queue_depth.inc()
         return await future
 
     async def _drain_loop(self):
@@ -50,6 +53,8 @@ class AsyncBatcher:
             frames = np.stack([item[0] for item in items])
             futures = [item[1] for item in items]
 
+            batcher_batch_size.observe(len(items))
+
             try:
                 dets_list, elapsed_ms = await loop.run_in_executor(
                     None, self._triton.infer_batch, frames
@@ -62,9 +67,11 @@ class AsyncBatcher:
                 for future, dets in zip(futures, dets_list):
                     if not future.done():
                         future.set_result((dets, per_item_ms))
+                        batcher_queue_depth.dec()
             except BaseException as e:
                 for future in futures:
                     if not future.done():
                         future.set_exception(e)
+                        batcher_queue_depth.dec()
                 if isinstance(e, (asyncio.CancelledError, GeneratorExit)):
                     raise
