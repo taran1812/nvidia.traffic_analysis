@@ -4,7 +4,7 @@ __pycache__/
 *.pyc
 *.egg-info/
 .git/
-serving/model_repository/
+serving/
 *.engine
 *.onnx
 *.pt
@@ -12,3 +12,5 @@ docs/
 *.jpg
 *.png
 *.csv
+.env
+.env.*
