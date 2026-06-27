@@ -11,7 +11,7 @@
       "title": "Batcher Queue Depth",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "fieldConfig": { "defaults": {} },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
       "targets": [
         {
           "datasource": "Prometheus",
@@ -25,7 +25,7 @@
       "title": "Detections by Class",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-      "fieldConfig": { "defaults": {} },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
       "targets": [
         {
           "datasource": "Prometheus",
@@ -39,7 +39,7 @@
       "title": "Inference Latency",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "fieldConfig": { "defaults": {} },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
       "targets": [
         {
           "datasource": "Prometheus",
@@ -58,7 +58,7 @@
       "title": "GPU Utilization",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "fieldConfig": { "defaults": {} },
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] },
       "targets": [
         {
           "datasource": "Prometheus",
@@ -72,7 +72,7 @@
       "title": "Requests per Second",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-      "fieldConfig": { "defaults": {} },
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
       "targets": [
         {
           "datasource": "Prometheus",
@@ -86,12 +86,25 @@
       "title": "Batch Size Distribution",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
-      "fieldConfig": { "defaults": {} },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
       "targets": [
         {
           "datasource": "Prometheus",
-          "expr": "rate(batcher_batch_size_bucket[1m])",
-          "legendFormat": "{{le}}"
+          "expr": "histogram_quantile(0.5, rate(batcher_batch_size_bucket[1m]))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.95, rate(batcher_batch_size_bucket[1m]))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.99, rate(batcher_batch_size_bucket[1m]))",
+          "legendFormat": "p99",
+          "refId": "C"
         }
       ]
     }
