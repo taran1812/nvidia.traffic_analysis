@@ -1,7 +1,7 @@
 from prometheus_client import Counter, Gauge, Histogram
 
 detection_total = Counter(
-    "detection_total",
+    "detections",
     "Total detections by class",
     ["class_name"],
 )
