@@ -76,58 +76,6 @@ Video input (MP4 / RTSP)
 
 ---
 
-## Project status
-
-### ✅ Done — Week 1: TensorRT optimization
-
-- [x] WSL2 + Ubuntu 22.04 environment setup
-- [x] GPU passthrough verified (`nvidia-smi` in WSL2)
-- [x] PyTorch 2.11 with CUDA 12.8 confirmed on RTX 3050 Ti
-- [x] YOLOv8n inference running on GPU (51ms, 6 detections on test image)
-- [x] ONNX export — yolov8n.onnx (12.3MB)
-- [x] TensorRT FP16 engine build — yolov8n.engine (8.8MB, 88s compile)
-- [x] 3-way benchmark: PyTorch vs ONNX vs TensorRT — **1.8× improvement**
-
-### ✅ Week 2: DeepStream pipeline
-
-- [x] Pull Nvidia DeepStream Docker image (`nvcr.io/nvidia/deepstream:7.1-triton-multiarch`)
-- [x] Build DeepStream pipeline: video file → TensorRT YOLOv8 → bounding boxes
-- [x] Download UA-DETRAC traffic dataset
-- [x] Add vehicle counting logic: sliding 60s window per class
-- [x] Resolve dGPU compatibility issues, validate pipeline end-to-end
-
-### ✅ Week 3: Triton Inference Server
-
-- [x] Rebuild YOLOv8n TRT engine with dynamic batch (min=1, opt=8, max=16) via TRT 10.3
-- [x] Configure Triton model repository — TRT backend, explicit batch (max_batch_size=0)
-- [x] Docker Compose stack: Triton 24.08 + Prometheus + Grafana
-- [x] Prometheus scraping Triton `/metrics` at 5s interval
-- [x] Grafana dashboard: GPU util, throughput, compute latency, VRAM
-- [x] Batch sweep benchmark (1/4/8/16) — peak 63 FPS at batch=4 on RTX 3050 Ti
-
-### ✅ Week 4: FastAPI gateway
-
-- [x] FastAPI service: POST /detect (file upload), POST /detect/url, GET /health
-- [x] Async batching via AsyncBatcher — 50ms drain interval, up to 16 frames/batch
-- [x] Full NMS post-processing: YOLOv8n output → detections with class names + normalized bboxes
-- [x] Locust load test configured: 50 users, 60s, POST bus.jpg to /detect
-- [x] 21 unit tests passing across preprocess, triton wrapper, batcher, and API endpoints
-
-### ✅ Week 5: Observability
-
-- [x] Prometheus scraping: Triton metrics + custom FastAPI metrics
-- [x] Grafana dashboard: req/s, inference latency p50/p95, detections by class, batcher queue depth, batch size distribution, GPU utilization
-- [x] Custom metrics: `detections_total`, `inference_duration_seconds`, `batcher_queue_depth`, `batcher_batch_size`
-
-### ✅ Week 6: Polish and publish
-
-- [x] FastAPI containerized — `Dockerfile` at project root
-- [x] Root `docker-compose.yml` — one-command full stack (Triton + FastAPI + Prometheus + Grafana)
-- [x] README updated with final architecture and setup instructions
-- [x] Published to GitHub: https://github.com/taran1812/nvidia.traffic_analysis
-
----
-
 ## Setup
 
 ### Prerequisites
