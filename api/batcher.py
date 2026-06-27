@@ -26,6 +26,12 @@ class AsyncBatcher:
                 await self._task
             except asyncio.CancelledError:
                 pass
+        # Drain any frames that were queued but never processed
+        while not self._queue.empty():
+            frame, future = self._queue.get_nowait()
+            batcher_queue_depth.dec()
+            if not future.done():
+                future.set_exception(asyncio.CancelledError())
 
     async def submit(self, frame: np.ndarray) -> tuple[list, float]:
         if self._queue.qsize() >= self._max_queue:
@@ -47,9 +53,6 @@ class AsyncBatcher:
             while not self._queue.empty() and len(items) < self._max_batch:
                 items.append(self._queue.get_nowait())
 
-            if not items:
-                continue
-
             frames = np.stack([item[0] for item in items])
             futures = [item[1] for item in items]
 
@@ -65,13 +68,13 @@ class AsyncBatcher:
                     )
                 per_item_ms = elapsed_ms / len(items)
                 for future, dets in zip(futures, dets_list):
+                    batcher_queue_depth.dec()
                     if not future.done():
                         future.set_result((dets, per_item_ms))
-                        batcher_queue_depth.dec()
             except BaseException as e:
                 for future in futures:
+                    batcher_queue_depth.dec()
                     if not future.done():
                         future.set_exception(e)
-                        batcher_queue_depth.dec()
                 if isinstance(e, (asyncio.CancelledError, GeneratorExit)):
                     raise
