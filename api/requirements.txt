@@ -1,8 +1,9 @@
-fastapi>=0.111.0
-uvicorn[standard]>=0.29.0
-python-multipart>=0.0.9
-httpx>=0.27.0
-tritonclient[http]>=2.49.0
-opencv-python-headless>=4.9.0
-numpy>=1.26.0
-prometheus-fastapi-instrumentator>=0.9.1
+fastapi==0.138.1
+uvicorn==0.49.0
+tritonclient[http]==2.70.0
+prometheus-fastapi-instrumentator==8.0.2
+prometheus_client==0.25.0
+opencv-python-headless==4.13.0.92
+httpx==0.28.1
+numpy==2.2.6
+pydantic==2.13.4
