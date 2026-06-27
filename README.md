@@ -113,6 +113,8 @@ docker compose up
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000 → Dashboards → FastAPI Gateway
 
+![Grafana dashboard](docs/images/grafana-dashboard.png)
+
 ---
 
 ## File structure
