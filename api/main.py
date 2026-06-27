@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
@@ -16,7 +17,7 @@ _batcher: AsyncBatcher | None = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _triton, _batcher
-    _triton = TritonClient(url="localhost:8000")
+    _triton = TritonClient(url=os.getenv("TRITON_URL", "localhost:8000"))
     _batcher = AsyncBatcher(triton=_triton)
     await _batcher.start()
     yield

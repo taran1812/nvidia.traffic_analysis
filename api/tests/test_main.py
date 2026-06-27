@@ -77,3 +77,15 @@ def test_health_triton_unavailable():
             resp = c.get("/health")
             assert resp.status_code == 200
             assert resp.json()["triton"] == "unavailable"
+
+
+def test_triton_url_from_env(monkeypatch):
+    monkeypatch.setenv("TRITON_URL", "triton:8000")
+    with patch('api.main.TritonClient') as mock_tc, \
+         patch('api.main.AsyncBatcher') as mock_batcher_cls:
+        mock_batcher_cls.return_value.start = AsyncMock()
+        mock_batcher_cls.return_value.stop = AsyncMock()
+        from api.main import app
+        with TestClient(app):
+            pass
+    mock_tc.assert_called_once_with(url="triton:8000")
