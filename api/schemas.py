@@ -16,3 +16,15 @@ class DetectResponse(BaseModel):
 
 class DetectURLRequest(BaseModel):
     url: AnyHttpUrl
+
+
+class FrameDetection(BaseModel):
+    frame: int
+    detections: list[Detection]
+
+
+class VideoDetectResponse(BaseModel):
+    frames: list[FrameDetection]
+    total_frames: int
+    processed_frames: int
+    model: str

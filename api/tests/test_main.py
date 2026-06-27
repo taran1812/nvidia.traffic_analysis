@@ -89,3 +89,26 @@ def test_triton_url_from_env(monkeypatch):
         with TestClient(app):
             pass
     mock_tc.assert_called_once_with(url="triton:8000")
+
+
+def test_detect_video_upload(client, mock_batcher):
+    # Create a minimal valid MP4-like video using cv2
+    import tempfile, os
+    tmp = tempfile.NamedTemporaryFile(suffix=".avi", delete=False)
+    tmp.close()
+    out = cv2.VideoWriter(tmp.name, cv2.VideoWriter_fourcc(*"XVID"), 30, (100, 100))
+    for _ in range(5):
+        out.write(np.zeros((100, 100, 3), dtype=np.uint8))
+    out.release()
+    with open(tmp.name, "rb") as f:
+        video_bytes = f.read()
+    os.unlink(tmp.name)
+
+    resp = client.post("/detect/video", files={"file": ("test.avi", video_bytes, "video/x-msvideo")})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "frames" in data
+    assert "total_frames" in data
+    assert "processed_frames" in data
+    assert data["model"] == "yolov8n"
+    assert data["processed_frames"] == data["total_frames"]
