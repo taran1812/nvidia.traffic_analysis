@@ -92,13 +92,13 @@ Video input (MP4 / RTSP)
 - [x] Grafana dashboard: GPU util, throughput, compute latency, VRAM
 - [x] Batch sweep benchmark (1/4/8/16) — peak 63 FPS at batch=4 on RTX 3050 Ti
 
-### 🔲 Week 4: FastAPI gateway
+### ✅ Week 4: FastAPI gateway
 
-- [ ] Build FastAPI service accepting video URL or image
-- [ ] Route inference requests through Triton
-- [ ] Add async batching — queue multiple frames, process in batches
-- [ ] Return detections as JSON with bounding boxes and confidence scores
-- [ ] Load test with locust: measure throughput under concurrent requests
+- [x] FastAPI service: POST /detect (file upload), POST /detect/url, GET /health
+- [x] Async batching via AsyncBatcher — 50ms drain interval, up to 16 frames/batch
+- [x] Full NMS post-processing: YOLOv8n output → detections with class names + normalized bboxes
+- [x] Locust load test configured: 50 users, 60s, POST bus.jpg to /detect
+- [x] 21 unit tests passing across preprocess, triton wrapper, batcher, and API endpoints
 
 ### 🔲 Week 5: Observability
 
