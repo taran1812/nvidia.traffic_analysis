@@ -1,0 +1,99 @@
+{
+  "title": "FastAPI Gateway",
+  "uid": "fastapi-gateway",
+  "version": 1,
+  "schemaVersion": 38,
+  "refresh": "5s",
+  "time": { "from": "now-5m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Batcher Queue Depth",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": { "defaults": {} },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "batcher_queue_depth",
+          "legendFormat": "queue depth"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Detections by Class",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": {} },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(detections_total[1m])",
+          "legendFormat": "{{class_name}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Inference Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": {} },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.5, rate(inference_duration_seconds_bucket[1m]))",
+          "legendFormat": "p50"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.95, rate(inference_duration_seconds_bucket[1m]))",
+          "legendFormat": "p95"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "GPU Utilization",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": {} },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "nv_gpu_utilization",
+          "legendFormat": "GPU util %"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Requests per Second",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "fieldConfig": { "defaults": {} },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(http_requests_total{handler=\"/detect\"}[1m])",
+          "legendFormat": "req/s"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Batch Size Distribution",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "fieldConfig": { "defaults": {} },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(batcher_batch_size_bucket[1m])",
+          "legendFormat": "{{le}}"
+        }
+      ]
+    }
+  ]
+}
