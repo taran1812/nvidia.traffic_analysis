@@ -32,6 +32,19 @@ TensorRT FP16 delivers **1.8× faster inference** over PyTorch baseline with **4
 
 Peak throughput at batch=4 (63 FPS). Dynamic batching configured via Triton with preferred batch sizes [4, 8].
 
+**FastAPI gateway — load test (50 concurrent users, 60s, RTX 3050 Ti):**
+
+| Metric | Value |
+|---|---|
+| Requests | 1,865 |
+| Error rate | 0% |
+| Throughput | 31 req/s |
+| p50 latency | 1,200ms |
+| p95 latency | 1,500ms |
+| p99 latency | 1,700ms |
+
+End-to-end latency includes FastAPI, AsyncBatcher (50ms drain, up to 16 frames/batch), Triton inference, and NMS post-processing.
+
 ---
 
 ## Architecture
