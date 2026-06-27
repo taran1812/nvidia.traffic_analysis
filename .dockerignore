@@ -1,0 +1,14 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.git/
+serving/model_repository/
+*.engine
+*.onnx
+*.pt
+docs/
+*.jpg
+*.png
+*.csv
