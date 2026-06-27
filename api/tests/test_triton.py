@@ -32,6 +32,11 @@ def test_parse_output_detects_high_confidence_box():
     assert len(result[0]) == 1
     assert result[0][0].class_name == "car"
     assert result[0][0].confidence == pytest.approx(0.9, abs=0.01)
+    x1, y1, x2, y2 = result[0][0].bbox
+    assert x1 == pytest.approx(270/640, abs=0.001)
+    assert y1 == pytest.approx(270/640, abs=0.001)
+    assert x2 == pytest.approx(370/640, abs=0.001)
+    assert y2 == pytest.approx(370/640, abs=0.001)
 
 
 def test_parse_output_bbox_normalized():
@@ -44,10 +49,10 @@ def test_parse_output_bbox_normalized():
     result = parse_output(raw, conf_thresh=0.25, iou_thresh=0.45)
     assert len(result[0]) == 1
     x1, y1, x2, y2 = result[0][0].bbox
-    assert 0.0 <= x1 <= 1.0
-    assert 0.0 <= y1 <= 1.0
-    assert 0.0 <= x2 <= 1.0
-    assert 0.0 <= y2 <= 1.0
+    assert x1 == pytest.approx(0.0, abs=0.001)
+    assert y1 == pytest.approx(0.0, abs=0.001)
+    assert x2 == pytest.approx(1.0, abs=0.001)
+    assert y2 == pytest.approx(1.0, abs=0.001)
 
 
 def test_parse_output_filters_low_confidence():

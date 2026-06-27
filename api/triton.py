@@ -68,7 +68,7 @@ class TritonClient:
         except Exception:
             return False
 
-    def infer_batch(self, frames: np.ndarray) -> tuple[list[list[Detection]], float]:
+    def infer_batch(self, frames: np.ndarray, conf_thresh: float = 0.25, iou_thresh: float = 0.45) -> tuple[list[list[Detection]], float]:
         """Send [N, 3, 640, 640] FP32 batch to Triton, return (detections_per_image, elapsed_ms)."""
         inp = httpclient.InferInput("images", list(frames.shape), "FP32")
         inp.set_data_from_numpy(frames)
@@ -82,5 +82,5 @@ class TritonClient:
         )
         elapsed_ms = (time.perf_counter() - t0) * 1000
         raw = result.as_numpy("output0")
-        dets = parse_output(raw)
+        dets = parse_output(raw, conf_thresh=conf_thresh, iou_thresh=iou_thresh)
         return dets, elapsed_ms
