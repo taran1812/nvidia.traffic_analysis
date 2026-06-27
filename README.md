@@ -140,8 +140,8 @@ Video input (MP4 / RTSP)
 ### Install
 
 ```bash
-git clone https://github.com/taran1812/nvidia-traffic-analytics
-cd nvidia-traffic-analytics
+git clone https://github.com/taran1812/nvidia.traffic_analysis
+cd nvidia.traffic_analysis
 python3 -m venv venv && source venv/bin/activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 pip install ultralytics onnx onnxruntime-gpu tensorrt-cu12 nvidia-modelopt[onnx]
