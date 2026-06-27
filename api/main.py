@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import numpy as np
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from api.batcher import AsyncBatcher
 from api.preprocess import load_from_bytes, load_from_url, preprocess
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Traffic Analytics API", lifespan=lifespan)
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/health")

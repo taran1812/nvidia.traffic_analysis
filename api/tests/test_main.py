@@ -60,6 +60,12 @@ def test_detect_invalid_image_returns_422(client):
     assert resp.status_code == 422
 
 
+def test_metrics_endpoint_exists(client):
+    resp = client.get("/metrics")
+    assert resp.status_code == 200
+    assert "text/plain" in resp.headers["content-type"]
+
+
 def test_health_triton_unavailable():
     with patch('api.main.AsyncBatcher') as mock_batcher_cls, \
          patch('api.main.TritonClient') as mock_triton_cls:
