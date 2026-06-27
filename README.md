@@ -113,21 +113,18 @@ Video input (MP4 / RTSP)
 - [x] Locust load test configured: 50 users, 60s, POST bus.jpg to /detect
 - [x] 21 unit tests passing across preprocess, triton wrapper, batcher, and API endpoints
 
-### 🔲 Week 5: Observability
+### ✅ Week 5: Observability
 
-- [ ] Prometheus scraping: Triton metrics + custom FastAPI metrics
-- [ ] Grafana dashboard: FPS, GPU utilization, inference latency p50/p95, detection count over time
-- [ ] Screenshot dashboard for README
-- [ ] Add hallucination-style guardrail: flag low-confidence detections below threshold
+- [x] Prometheus scraping: Triton metrics + custom FastAPI metrics
+- [x] Grafana dashboard: req/s, inference latency p50/p95, detections by class, batcher queue depth, batch size distribution, GPU utilization
+- [x] Custom metrics: `detections_total`, `inference_duration_seconds`, `batcher_queue_depth`, `batcher_batch_size`
 
-### 🔲 Week 6: Polish and publish
+### ✅ Week 6: Polish and publish
 
-- [ ] Docker Compose full stack: DeepStream + Triton + FastAPI + Prometheus + Grafana
-- [ ] Write benchmark report: methodology, hardware, results, limitations
-- [ ] Clean README with architecture diagram and results screenshots
-- [ ] Publish on GitHub with one-command setup
-- [ ] Write LinkedIn post: "Real-time traffic analytics on Nvidia DeepStream + TensorRT — benchmark results"
-- [ ] Tag @NvidiaAI on LinkedIn
+- [x] FastAPI containerized — `Dockerfile` at project root
+- [x] Root `docker-compose.yml` — one-command full stack (Triton + FastAPI + Prometheus + Grafana)
+- [x] README updated with final architecture and setup instructions
+- [x] Published to GitHub: https://github.com/taran1812/nvidia.traffic_analysis
 
 ---
 
@@ -156,11 +153,17 @@ pip install ultralytics onnx onnxruntime-gpu tensorrt-cu12 nvidia-modelopt[onnx]
 python3 benchmark.py
 ```
 
-### Run full pipeline (Week 6+)
+### Run full stack
 
 ```bash
+git clone https://github.com/taran1812/nvidia.traffic_analysis
+cd nvidia.traffic_analysis
 docker compose up
 ```
+
+- FastAPI: http://localhost:8081/docs
+- Prometheus: http://localhost:9090
+- Grafana: http://localhost:3000 → Dashboards → FastAPI Gateway
 
 ---
 
