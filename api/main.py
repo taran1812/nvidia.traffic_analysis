@@ -40,6 +40,8 @@ async def detect_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=422, detail="Invalid image")
     h, w = img.shape[:2]
     frame = preprocess(img)
+    if _batcher is None:
+        raise HTTPException(status_code=503, detail="Service not ready")
     dets, elapsed_ms = await _batcher.submit(frame)
     return DetectResponse(
         detections=dets,
@@ -51,12 +53,15 @@ async def detect_file(file: UploadFile = File(...)):
 
 @app.post("/detect/url", response_model=DetectResponse)
 async def detect_url(body: DetectURLRequest):
+    import httpx
     try:
         img = load_from_url(str(body.url))
-    except Exception:
+    except (httpx.HTTPStatusError, httpx.RequestError, ValueError, OSError):
         raise HTTPException(status_code=400, detail="Failed to fetch or decode image from URL")
     h, w = img.shape[:2]
     frame = preprocess(img)
+    if _batcher is None:
+        raise HTTPException(status_code=503, detail="Service not ready")
     dets, elapsed_ms = await _batcher.submit(frame)
     return DetectResponse(
         detections=dets,
