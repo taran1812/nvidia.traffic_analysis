@@ -133,12 +133,6 @@ nvidia-traffic-analytics/
 
 ---
 
-## Resume bullet
-
-> Optimized YOLOv8 inference using TensorRT FP16 quantization on RTX 3050 Ti; achieved 1.8× FPS improvement over PyTorch baseline (60 → 110 FPS) with 44% latency reduction — 99.1% of model nodes converted to FP16. Served via Triton Inference Server with GPU observability via Prometheus and Grafana.
-
----
-
 ## Tech stack
 
 Python · PyTorch · YOLOv8 · ONNX · TensorRT · Nvidia DeepStream · Triton Inference Server · FastAPI · Prometheus · Grafana · Docker · WSL2 · CUDA 12.8
