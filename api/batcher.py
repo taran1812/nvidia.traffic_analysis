@@ -28,13 +28,13 @@ class AsyncBatcher:
     async def submit(self, frame: np.ndarray) -> tuple[list, float]:
         if self._queue.qsize() >= self._max_queue:
             raise RuntimeError("queue full")
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         future: asyncio.Future = loop.create_future()
         await self._queue.put((frame, future))
         return await future
 
     async def _drain_loop(self):
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         while self._running:
             await asyncio.sleep(self._drain_interval)
             if self._queue.empty():
@@ -54,11 +54,17 @@ class AsyncBatcher:
                 dets_list, elapsed_ms = await loop.run_in_executor(
                     None, self._triton.infer_batch, frames
                 )
+                if len(dets_list) != len(items):
+                    raise RuntimeError(
+                        f"Triton returned {len(dets_list)} results for {len(items)} items"
+                    )
                 per_item_ms = elapsed_ms / len(items)
                 for future, dets in zip(futures, dets_list):
                     if not future.done():
                         future.set_result((dets, per_item_ms))
-            except Exception as e:
+            except BaseException as e:
                 for future in futures:
                     if not future.done():
                         future.set_exception(e)
+                if isinstance(e, (asyncio.CancelledError, GeneratorExit)):
+                    raise
