@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from api.batcher import AsyncBatcher
+from api.metrics import detection_total, inference_duration_seconds
 from api.preprocess import load_from_bytes, load_from_url, preprocess
 from api.schemas import DetectResponse, DetectURLRequest
 from api.triton import TritonClient
@@ -44,6 +45,9 @@ async def detect_file(file: UploadFile = File(...)):
     if _batcher is None:
         raise HTTPException(status_code=503, detail="Service not ready")
     dets, elapsed_ms = await _batcher.submit(frame)
+    inference_duration_seconds.observe(elapsed_ms / 1000)
+    for det in dets:
+        detection_total.labels(class_name=det.class_name).inc()
     return DetectResponse(
         detections=dets,
         inference_time_ms=elapsed_ms,
@@ -64,6 +68,9 @@ async def detect_url(body: DetectURLRequest):
     if _batcher is None:
         raise HTTPException(status_code=503, detail="Service not ready")
     dets, elapsed_ms = await _batcher.submit(frame)
+    inference_duration_seconds.observe(elapsed_ms / 1000)
+    for det in dets:
+        detection_total.labels(class_name=det.class_name).inc()
     return DetectResponse(
         detections=dets,
         inference_time_ms=elapsed_ms,
